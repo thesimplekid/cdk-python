@@ -120,8 +120,18 @@ jobs:
 
       - name: Set up Python ${{ matrix.python-version }}
         run: |
-          /opt/python/cp$(echo ${{ matrix.python-version }} | tr -d .)-*/bin/python -m pip install --upgrade pip
-          /opt/python/cp$(echo ${{ matrix.python-version }} | tr -d .)-*/bin/python -m pip install build wheel
+          PYVER=$(echo ${{ matrix.python-version }} | tr -d .)
+          PYTHON_BIN="/opt/python/cp${PYVER}-cp${PYVER}/bin/python"
+
+          # Fallback to glob pattern if exact path doesn't exist (for older Python versions)
+          if [ ! -f "$PYTHON_BIN" ]; then
+            PYTHON_BIN=$(ls /opt/python/cp${PYVER}-cp${PYVER}*/bin/python | grep -v "t/bin/python" | head -n1)
+          fi
+
+          echo "Using Python: $PYTHON_BIN"
+          $PYTHON_BIN --version
+          $PYTHON_BIN -m pip install --upgrade pip
+          $PYTHON_BIN -m pip install build wheel
 
       - name: Install Rust
         run: |
@@ -134,7 +144,16 @@ jobs:
           source $HOME/.cargo/env
           chmod +x scripts/generate-linux-x86_64.sh
           ./scripts/generate-linux-x86_64.sh
-          /opt/python/cp$(echo ${{ matrix.python-version }} | tr -d .)-*/bin/python -m build --wheel
+
+          # Use the same Python binary selection logic
+          PYVER=$(echo ${{ matrix.python-version }} | tr -d .)
+          PYTHON_BIN="/opt/python/cp${PYVER}-cp${PYVER}/bin/python"
+          if [ ! -f "$PYTHON_BIN" ]; then
+            PYTHON_BIN=$(ls /opt/python/cp${PYVER}-cp${PYVER}*/bin/python | grep -v "t/bin/python" | head -n1)
+          fi
+
+          echo "Building wheel with: $PYTHON_BIN"
+          $PYTHON_BIN -m build --wheel
 
       - name: Upload wheel
         uses: actions/upload-artifact@v4
