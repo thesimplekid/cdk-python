@@ -62,12 +62,18 @@ jobs:
         run: |
           VERSION="${{ steps.extract_version.outputs.version }}"
 
-          # Update version in pyproject.toml using sed
+          # Update version in pyproject.toml
           sed -i "s/^version = .*/version = \"$VERSION\"/" pyproject.toml
 
-          # Verify the change
+          # Update version in __init__.py
+          sed -i "s/^__version__ = .*/__version__ = \"$VERSION\"  # Updated automatically by CI during release/" src/cdk/__init__.py
+
+          # Verify the changes
           echo "Updated pyproject.toml:"
           grep "^version = " pyproject.toml
+          echo ""
+          echo "Updated __init__.py:"
+          grep "^__version__ = " src/cdk/__init__.py
 
       - name: Commit version update
         id: commit
@@ -77,14 +83,14 @@ jobs:
 
           SKIP_COMMIT="${{ github.event.inputs.skip_version_commit || 'false' }}"
 
-          if git diff --quiet pyproject.toml; then
+          if git diff --quiet pyproject.toml src/cdk/__init__.py; then
             echo "No version changes to commit"
             COMMIT_SHA="${{ github.sha }}"
           elif [ "$SKIP_COMMIT" = "true" ]; then
             echo "⚠️  Skipping version commit (test mode)"
             COMMIT_SHA="${{ github.sha }}"
           else
-            git add pyproject.toml
+            git add pyproject.toml src/cdk/__init__.py
             git commit -m "chore: bump version to ${{ steps.extract_version.outputs.version }}"
             git push
             COMMIT_SHA=$(git rev-parse HEAD)

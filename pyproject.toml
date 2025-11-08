@@ -46,7 +46,9 @@ packages = ["cdk"]
 cdk = "src/cdk"
 
 [tool.setuptools.package-data]
-cdk = ["*.so", "*.dylib", "*.dll"]
+# Include binary extensions when they exist (for wheel builds)
+# These are excluded from sdist via MANIFEST.in
+cdk = ["*.so", "*.dylib", "*.dll", "*.pyi"]
 
 [tool.pytest.ini_options]
 minversion = "6.0"
