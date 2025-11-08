@@ -20,10 +20,10 @@ TARGET="x86_64-pc-windows-msvc"
 echo "Adding Rust target: $TARGET"
 rustup target add $TARGET
 
-# Build cdk-ffi with postgres support
+# Build cdk-ffi
 echo "Building cdk-ffi for $TARGET..."
 cd $CDK_PATH/crates/cdk-ffi
-cargo build --profile release-smaller --target $TARGET --features postgres
+cargo build --profile release-smaller --target $TARGET
 
 # Generate Python bindings
 echo "Generating Python bindings..."
