@@ -155,6 +155,27 @@ jobs:
           echo "Building wheel with: $PYTHON_BIN"
           $PYTHON_BIN -m build --wheel
 
+      - name: Repair wheel with auditwheel
+        run: |
+          # Install auditwheel
+          PYVER=$(echo ${{ matrix.python-version }} | tr -d .)
+          PYTHON_BIN="/opt/python/cp${PYVER}-cp${PYVER}/bin/python"
+          if [ ! -f "$PYTHON_BIN" ]; then
+            PYTHON_BIN=$(ls /opt/python/cp${PYVER}-cp${PYVER}*/bin/python | grep -v "t/bin/python" | head -n1)
+          fi
+
+          $PYTHON_BIN -m pip install auditwheel
+
+          # Repair the wheel to add manylinux tag
+          mkdir -p wheelhouse
+          for whl in dist/*.whl; do
+            auditwheel repair "$whl" --plat manylinux_2_28_x86_64 -w wheelhouse/
+          done
+
+          # Replace dist with repaired wheels
+          rm -rf dist
+          mv wheelhouse dist
+
       - name: Upload wheel
         uses: actions/upload-artifact@v4
         with:
