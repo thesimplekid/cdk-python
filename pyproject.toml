@@ -8,18 +8,18 @@ version = "0.13.0"
 description = "Python bindings for the Cashu Development Kit (CDK)"
 readme = "README.md"
 requires-python = ">=3.10"
-license = {text = "MIT"}
+license = "MIT"
+license-files = ["LICENSE"]
 keywords = ["bitcoin", "e-cash", "cashu", "cdk", "wallet", "lightning"]
 authors = [
-    {name = "CDK Developers", email = "dev@cashu.space"}
+    {name = "CDK Developers", email = "tsk@cashudevkit.org"}
 ]
 maintainers = [
-    {name = "CDK Developers", email = "dev@cashu.space"}
+    {name = "CDK Developers", email = "tsk@cashudevkit.org"}
 ]
 classifiers = [
     "Development Status :: 4 - Beta",
     "Intended Audience :: Developers",
-    "License :: OSI Approved :: MIT License",
     "Operating System :: MacOS :: MacOS X",
     "Operating System :: Microsoft :: Windows",
     "Operating System :: POSIX :: Linux",

@@ -201,7 +201,8 @@ jobs:
       - name: Extract version from pyproject.toml
         id: get_version
         run: |
-          VERSION=$(python -c "import tomllib; f = open('pyproject.toml', 'rb'); data = tomllib.load(f); print(data['project']['version'])")
+          # Use grep/sed for compatibility with Python 3.10
+          VERSION=$(grep "^version = " pyproject.toml | sed 's/version = "\(.*\)"/\1/')
           echo "version=$VERSION" >> $GITHUB_OUTPUT
           echo "Publishing version: $VERSION to TestPyPI"
 
